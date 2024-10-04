@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Upload</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg">
+        <h1 class="text-2xl font-bold mb-4 text-center">Upload Image for OCR</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label for="imageInput" class="block text-gray-700 text-sm font-bold mb-2">Select an image:</label>
+                <input type="file" name="image" id="imageInput" accept="image/*" required class="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Upload and Perform OCR</button>
+            </div>
+        </form>
+
+        <h2 class="mt-8 text-xl font-semibold">OCR Result:</h2>
+        <pre id="ocrResult" class="border rounded bg-gray-100 p-2 mt-2 whitespace-pre-wrap break-words max-h-60 overflow-auto"></pre>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async function (event) {
+            event.preventDefault();  // Prevent form submission from reloading the page
+
+            const formData = new FormData();
+            const fileField = document.querySelector('input[type="file"]');
+
+            formData.append('image', fileField.files[0]);
+
+            const response = await fetch('http://localhost:3000/api/ocr', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById('ocrResult').textContent = result.text;
+            } else {
+                document.getElementById('ocrResult').textContent = `Error: ${result.error}`;
+            }
+        };
+    </script>
+</body>
+</html>
